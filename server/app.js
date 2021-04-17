@@ -19,12 +19,12 @@ app.get('/',(req,res)=>{
 })
 app.post('/query/:type',(req,res)=>{
  const {type}=req.params
- db.collection(type).find({}).toArray(function(error,result){
-  if(error){
-   return res.json({success:"false",error});
-  }
-  return res.json({success:"true",data: result[0][type]})
- });
+  db.collection(type).find({}).toArray(function(error,result){
+   if(error){
+    return res.json({success:"false",error});
+   }
+   return res.json({success:"true",data: result[0][type]})
+  });
 })
 app.listen(PORT,()=>{
  console.log(`Server is listening on PORT ${PORT}`);

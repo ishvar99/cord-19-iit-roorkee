@@ -1,8 +1,13 @@
 const data = require('../data/literature.json')
 const transformedData =require('../utils/transformData')(data.literatures);
-const connectDB =require('../database/db')
 const { exec } = require("child_process");
-connectDB()
+var MongoClient = require('mongodb').MongoClient;
+var db;
+MongoClient.connect("mongodb://localhost/cord-19",{ useUnifiedTopology: true }, function(err, client) {
+  if(err) return console.error(err);
+  db = client.db("cord-19"); 
+  console.log("MongoDB connected successfully!")
+ })
 const importData = async () => {
   await destroyData();
   Object.keys(transformedData).forEach((node)=>{ 

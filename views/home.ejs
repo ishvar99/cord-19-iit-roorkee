@@ -16,26 +16,57 @@
      <%});%>
  </select>
  <div class="d-flex justify-content-center mt-5">
- <input class="btn btn-primary w-25 rounded" type="submit">
+ <input class="btn btn-primary w-25 rounded mb-5" type="submit">
 </div>
 </form>
  </div>
  <br>
- <div id="result" class="container-fluid">
-  
+ <div style="display:none !important" id="loader" class="d-flex justify-content-center mt-5">
+  <div class="spinner-border" role="status">
+  </div>
+</div>
+<div style="display:none !important" id="error" class="d-flex justify-content-center mt-5">
+ <div class="alert alert-danger w-50 text-center" role="alert">
  </div>
+ </div>
+ <div id="result" class="container-fluid">
+ </div>
+</div>
 </div>
 	</body>
  <script>
   const loadResults=async(event)=>{
    event.preventDefault();
+   let results= document.querySelector("#result");
+   let err = document.querySelector("#error");
+   results.innerHTML="";
+   err.style.setProperty('display', 'none', 'important');
    const type = document.getElementById('type');
+   
+   let loader =document.getElementById('loader');
+   loader.style.display='';
    const response = await fetch(`http://localhost:3000/query/${type.value}`,{method:'POST'});
    const result = await response.json();
-   if(result.data)
-   document.querySelector("#result p").textContent= result.data;
-   else
-   document.querySelector("#result p").textContent= "Error";
+   if(result.data){
+    let tempStr="";
+    result.data.forEach((paper)=>{
+     loader.style.setProperty('display', 'none', 'important');
+     let card =`<div class="card text-center mb-5">
+   <div class="card-body">
+     <h5 class="card-title">${paper.title}</h5>
+     <p class="card-text">${paper.abstract}</p>
+   </div>
+ </div>`
+ tempStr+= card;
+    })
+    results.innerHTML+=tempStr;
+   }
+   else{
+    err.style.display='';
+    loader.style.setProperty('display', 'none', 'important');
+    let errorHeader = document.querySelector("#error div");
+    errorHeader.textContent="Something went wrong";
+   }
   }
  </script>
  </html>
