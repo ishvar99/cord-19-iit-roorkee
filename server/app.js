@@ -1,7 +1,12 @@
 const express = require('express')
 const createNodes = require('../utils/createNodes')
+const jwt = require('jsonwebtoken')
+const cookieParser = require("cookie-parser")
 const app =express();
+app.use(express.json())
+app.use(cookieParser())
 app.set("view engine","ejs");
+const {authorize,redirect}= require("../middlewares/authorize")
 const data = require('../data/literature.json')
 const transformedData =require('../utils/transformData')(data.literatures);
 const PORT =3000;
@@ -25,6 +30,27 @@ app.post('/query/:type',(req,res)=>{
    }
    return res.json({success:"true",data: result[0][type]})
   });
+})
+app.get('/admin/upload',authorize,(req,res)=>{
+  res.render('upload')
+})
+app.get('/admin',redirect, (req,res)=>{
+  res.render('admin')
+})
+app.post('/validate',async(req,res)=>{
+  const {email,password}=req.body
+  if(email === 'a@b.com'  && password=== 'qwerty'){
+    let token = await jwt.sign({ id: email+password }, "random-secret", {
+      expiresIn: 3 * 24 * 60 * 60 * 1000 //3 days
+    });
+    const options = {
+      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+    }
+    res.cookie("token", token, options)
+    return res.json({success:true});
+  }
+  return res.json({success:false});
 })
 app.listen(PORT,()=>{
  console.log(`Server is listening on PORT ${PORT}`);
