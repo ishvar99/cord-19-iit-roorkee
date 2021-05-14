@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const createNodes = require('../utils/createNodes')
 const jwt = require('jsonwebtoken')
@@ -37,9 +38,13 @@ app.get('/admin/upload',authorize,(req,res)=>{
 app.get('/admin',redirect, (req,res)=>{
   res.render('admin')
 })
+app.post('/logout',(req,res)=>{
+  res.clearCookie('token')
+  return res.json({ success: true })
+})
 app.post('/validate',async(req,res)=>{
   const {email,password}=req.body
-  if(email === 'a@b.com'  && password=== 'qwerty'){
+  if(email === process.env.EMAIL  && password=== process.env.PASSWORD){
     let token = await jwt.sign({ id: email+password }, "random-secret", {
       expiresIn: 3 * 24 * 60 * 60 * 1000 //3 days
     });
